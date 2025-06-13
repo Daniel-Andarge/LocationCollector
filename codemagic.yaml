@@ -7,9 +7,15 @@ workflows:
       vars:
         JAVA_VERSION: 11
     scripts:
-      - name: Make gradlew executable
-        script: chmod +x ./gradlew
-      - name: Build APK
-        script: ./gradlew assembleDebug
+      - name: Check and use gradlew if present
+        script: |
+          if [ -f "./gradle/wrapper/gradle-wrapper.jar" ]; then
+            echo "gradle-wrapper.jar found. Making gradlew executable..."
+            chmod +x ./gradlew
+            ./gradlew assembleDebug
+          else
+            echo "gradle-wrapper.jar not found. Falling back to system Gradle..."
+            gradle assembleDebug
+          fi
     artifacts:
       - app/build/outputs/**/*.apk
